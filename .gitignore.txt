@@ -1,0 +1,23 @@
+# Arduino / PlatformIO
+.pio/
+*.hex
+build/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# CAD
+*.SLDPRT.lck
+*~*
+*.bak
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
