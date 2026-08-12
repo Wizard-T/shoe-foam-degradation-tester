@@ -94,10 +94,9 @@ void setup() {//////////////////////////////////////////////////////////////////
   }
   displacement = 0.0;
 
-}/////////////////////////////////////////////////////////////////////////////////////////////
+  delayMicroseconds(1000);
 
-void loop() {////////////////////////////////////////////////////////////////////////////////
-
+  //start compression
   force = readForceGrams();
   digitalWrite(DIR_PIN, HIGH); //stepper direction
   delayMicroseconds(500);
@@ -110,9 +109,15 @@ void loop() {///////////////////////////////////////////////////////////////////
     Serial.println(force);
   }
 
+  //determine stiffness
   force = readForceGrams();
-  stiffness = force / displacement;
+  if(displacement > 0){
+    stiffness = force / displacement;
+  }else{
+    stiffness = -1;
+  }
 
+  //start decompression
   digitalWrite(DIR_PIN, LOW); //stepper direction
   delayMicroseconds(500);
   Serial.println();
@@ -127,10 +132,17 @@ void loop() {///////////////////////////////////////////////////////////////////
   
   //stiffness report
   Serial.println();
-  Serial.print("Stiffness: ");
-  Serial.println(stiffness);
+  if(stiffness == -1){
+    Serial.println("Warning: stiffness undefined (zero displacement)");
+  }else{
+    Serial.print("Stiffness: ");
+    Serial.println(stiffness);
+  }
 
-}/////////////////////////////////////////////////////////////////////////////////////////
+}/////////////////////////////////////////////////////////////////////////////////////////////
+
+void loop() {//empty
+}
 
 float readForceGrams(){
   return platform.get_units(3); //number of measurements averaged
