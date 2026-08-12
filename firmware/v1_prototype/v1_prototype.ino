@@ -24,7 +24,7 @@
 
   Notes:
     Written for Arduino Uno
-    Calibration factor must be obtained using seperate script and entered in here, will differ by hardware
+    Calibration factor must be obtained using calibration script and entered in here, will differ from one machine to another
 
   ============================================================
 */
@@ -32,8 +32,10 @@
 #include <HX711.h>
 
 HX711 platform;
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const float CALIBRATION_FACTOR = 419.5; // MEASURE AND UPDATE DURING SETUP
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 const float VERTICAL_INCREMENT = 0.1; //in mm
 float displacement = 0.0;
@@ -92,6 +94,9 @@ void setup() {//////////////////////////////////////////////////////////////////
     force = readForceGrams();
     homingSteps++;
   }
+  if (homingSteps >= MAX_HOMING_STEPS) {
+    Serial.println("Warning: homing failed to detect contact");
+  }
   displacement = 0.0;
 
   delayMicroseconds(1000);
@@ -142,6 +147,7 @@ void setup() {//////////////////////////////////////////////////////////////////
 }/////////////////////////////////////////////////////////////////////////////////////////////
 
 void loop() {//empty
+
 }
 
 float readForceGrams(){
