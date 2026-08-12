@@ -105,6 +105,8 @@ void setup() {//////////////////////////////////////////////////////////////////
   force = readForceGrams();
   digitalWrite(DIR_PIN, HIGH); //stepper direction
   delayMicroseconds(500);
+
+  Serial.println("displacement_mm,force_g");
  
   while(force<10000){ //tune this number
     advancePlatform();  
@@ -121,6 +123,7 @@ void setup() {//////////////////////////////////////////////////////////////////
   }else{
     stiffness = -1;
   }
+  Serial.println();
 
   //start decompression
   digitalWrite(DIR_PIN, LOW); //stepper direction

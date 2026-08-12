@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt
 displacement = []
 force = []
 
-with open(r"C:\Users\templ\OneDrive\Desktop\shoe-foam-degradation-tester\data\dummy data\test_session_known-values.csv") as f:
+file = r"C:\Users\templ\OneDrive\Desktop\shoe-foam-degradation-tester\data\dummy data\dummy_data_2.csv"
+
+with open(file) as f:
     reader = csv.DictReader(f)
     for row in reader:
         displacement.append(float(row["displacement_mm"]))
@@ -30,4 +32,24 @@ energy_returned = abs(np.trapezoid(release_force, release_displacement))
 print("Energy stored:", energy_stored)
 print("Energy returned:", energy_returned)
 
-print("Energy return ratio:", 100* energy_returned / energy_stored,"%")
+print("Energy return percentage:", 100* energy_returned / energy_stored,"%")
+
+
+release_displacement_sorted = release_displacement[::-1]
+release_force_sorted = release_force[::-1]
+
+release_displacement_sorted = release_displacement[::-1]
+release_force_sorted = release_force[::-1]
+
+# resample release curve onto loading_displacement's x-values
+release_force_interp = np.interp(loading_displacement, release_displacement_sorted, release_force_sorted)
+
+plt.fill_between(loading_displacement, loading_force, release_force_interp,
+                  alpha=0.2, label="Hysteresis loss", zorder=1)
+plt.plot(loading_displacement, loading_force, label="Compression (loading)", zorder=2)
+plt.plot(release_displacement, release_force, label="Release (unloading)", zorder=2)
+plt.xlabel("Displacement (mm)")
+plt.ylabel("Force (g)")
+plt.title("Force vs. Displacement")
+plt.legend()
+plt.show()
