@@ -61,6 +61,9 @@ int homingSteps = 0;
 float stiffness = 0.0;
 float force = 0.0;
 
+float energyStored = 0;
+float energyReturned = 0;
+
 //pinout
 const int DOUT_PIN = 2;
 const int SCK_PIN = 3;
@@ -107,6 +110,7 @@ void setup() {//////////////////////////////////////////////////////////////////
   delayMicroseconds(500);
 
   Serial.println("displacement_mm,force_g");
+  float previousForce = force;
  
   while(force<10000){ //tune this number
     advancePlatform();  
@@ -114,6 +118,8 @@ void setup() {//////////////////////////////////////////////////////////////////
     Serial.print(displacement);
     Serial.print(",");
     Serial.println(force);
+    energyStored += (force + previousForce) / 2.0 * VERTICAL_INCREMENT;
+    previousForce = force;
   }
 
   //determine stiffness
@@ -130,12 +136,17 @@ void setup() {//////////////////////////////////////////////////////////////////
   delayMicroseconds(500);
   Serial.println();
 
+  force = readForceGrams();
+  previousForce = force;
+
   while(displacement>0){
     retractPlatform();  
     force = readForceGrams();
     Serial.print(displacement);
     Serial.print(",");
     Serial.println(force);
+    energyReturned += (force + previousForce) / 2.0 * VERTICAL_INCREMENT;
+    previousForce = force;
   }
   
   //stiffness report
@@ -145,6 +156,21 @@ void setup() {//////////////////////////////////////////////////////////////////
   }else{
     Serial.print("Stiffness: ");
     Serial.println(stiffness);
+  }
+
+
+  //energy return
+  Serial.println();
+  Serial.print("Energy stored: ");
+  Serial.println(energyStored);
+  Serial.print("Energy returned: ");
+  Serial.println(energyReturned);
+  Serial.print("Energy return percentage: ");
+  if (energyStored > 0) {
+    Serial.print(100 * energyReturned / energyStored);
+    Serial.println("%");
+  } else {
+    Serial.println("undefined (zero energy stored)");
   }
 
 }/////////////////////////////////////////////////////////////////////////////////////////////
