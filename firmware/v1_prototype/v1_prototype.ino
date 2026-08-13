@@ -39,13 +39,17 @@ const float CALIBRATION_FACTOR = 419.5; // MEASURE AND UPDATE DURING SETUP
 
 const float VERTICAL_INCREMENT = 0.1; //in mm
 float displacement = 0.0;
+
 const int STEPS_PER_REV = 200;
 const int MICROSTEPS_PER_STEP = 8;  // may change based on MS1/MS2 wiring from board to board
 const float LEAD_SCREW_PITCH_MM = 2.0;
 const float MICROSTEPS_PER_MM = (STEPS_PER_REV * MICROSTEPS_PER_STEP) / LEAD_SCREW_PITCH_MM;
 const float MICROSTEPS = VERTICAL_INCREMENT * MICROSTEPS_PER_MM;
+
 const int MAX_HOMING_STEPS = 5000; // tune this number
 int homingSteps = 0;
+
+int stepperDelay = 200;
 
   /*
   Lead screw pitch is 2mm, meaning rotating the lead screw once will move the compressor 2mm
@@ -91,9 +95,9 @@ void setup() {//////////////////////////////////////////////////////////////////
   digitalWrite(DIR_PIN, HIGH); //stepper direction
   while(force < 25 && homingSteps < MAX_HOMING_STEPS){ //tune this number
     digitalWrite(STEP_PIN, HIGH);
-    delayMicroseconds(200);
+    delayMicroseconds(stepperDelay);
     digitalWrite(STEP_PIN, LOW);
-    delayMicroseconds(200);
+    delayMicroseconds(stepperDelay);
     force = readForceGrams();
     homingSteps++;
   }
@@ -112,13 +116,13 @@ void setup() {//////////////////////////////////////////////////////////////////
   Serial.println("displacement_mm,force_g");
   float previousForce = force;
  
-  while(force<10000){ //tune this number
+  while(force<10000){ //10kg, tune this number
     advancePlatform();  
     force = readForceGrams();
     Serial.print(displacement);
     Serial.print(",");
     Serial.println(force);
-    energyStored += (force + previousForce) / 2.0 * VERTICAL_INCREMENT;
+    energyStored += (force + previousForce) / 2.0 * VERTICAL_INCREMENT; //trapezoidal integration
     previousForce = force;
   }
 
@@ -129,7 +133,6 @@ void setup() {//////////////////////////////////////////////////////////////////
   }else{
     stiffness = -1;
   }
-  Serial.println();
 
   //start decompression
   digitalWrite(DIR_PIN, LOW); //stepper direction
@@ -186,9 +189,9 @@ float readForceGrams(){
 void advancePlatform(){
   for(int i=0; i<MICROSTEPS; i++){
     digitalWrite(STEP_PIN, HIGH);
-    delayMicroseconds(500);
+    delayMicroseconds(stepperDelay);
     digitalWrite(STEP_PIN, LOW);
-    delayMicroseconds(500);
+    delayMicroseconds(stepperDelay);
   }
   displacement += VERTICAL_INCREMENT;
 }
@@ -196,9 +199,9 @@ void advancePlatform(){
 void retractPlatform(){
   for(int i=0; i<MICROSTEPS; i++){
     digitalWrite(STEP_PIN, HIGH);
-    delayMicroseconds(500);
+    delayMicroseconds(stepperDelay);
     digitalWrite(STEP_PIN, LOW);
-    delayMicroseconds(500);
+    delayMicroseconds(stepperDelay);
   }
   displacement -= VERTICAL_INCREMENT;
 }

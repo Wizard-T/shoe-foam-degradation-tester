@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 displacement = []
 force = []
 
-file = r"C:\Users\templ\OneDrive\Desktop\shoe-foam-degradation-tester\data\dummy data\dummy_data_2.csv"
+file = r"C:\Users\templ\OneDrive\Desktop\shoe-foam-degradation-tester\data\dummy data\dummy_output_1.csv"
 
 with open(file) as f:
     reader = csv.DictReader(f)
@@ -18,6 +18,13 @@ force_arr = np.array(force)
 
 # find where loading ends and release begins
 peak_index = np.argmax(displacement_arr)
+
+peak_displacement = displacement_arr[peak_index]
+peak_force = force_arr[peak_index]
+
+stiffness = peak_force / peak_displacement if peak_displacement > 0 else None
+
+print("Stiffness:", stiffness)
 
 # split into two halves at the peak
 loading_displacement = displacement_arr[:peak_index + 1]
