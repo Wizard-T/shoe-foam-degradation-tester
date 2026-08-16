@@ -1,5 +1,6 @@
 import csv
 import numpy as np
+from datetime import date
 
 data_file = "C:\\Users\\templ\\OneDrive\\Desktop\\shoe-foam-degradation-tester\\data\\dummy data\\dummy_output_1.csv" #input("Enter the path to the raw session .csv file: ")
 shoes_file = "C:\\Users\\templ\\OneDrive\\Desktop\\shoe-foam-degradation-tester\\data\\results\\shoes.csv"
@@ -60,7 +61,10 @@ def createNewShoeEntry(owner=None):
         writer.writerow([new_shoe_id, brand, model, size, owner, date_acquired, notes])
 
     print(f"New shoe entry created with ID: {new_shoe_id}")
-    return new_shoe_id
+    return {
+        "shoe_id": new_shoe_id, "brand": brand, "model": model,
+        "size": size, "owner": owner, "date_acquired": date_acquired, "notes": notes
+    }
 
 def listShoesByOwner(owner):
     with open(shoes_file) as f:
@@ -174,19 +178,21 @@ stiffness, energy_stored, energy_returned, energy_return_pct = calculateEnergyRe
 selected_shoe, owner = selectShoe()
 
 if selected_shoe is None:
-    found_shoe_id = createNewShoeEntry(owner)
-else:
-    found_shoe_id = selected_shoe["shoe_id"]
-    brand = selected_shoe["brand"]
-    model = selected_shoe["model"]
-    size = selected_shoe["size"]
-    date_acquired = selected_shoe["date_acquired"]
-    notes = selected_shoe["notes"]
-    print("\nShoe details:\nID-", found_shoe_id, "\nBrand-", brand, "\nModel-", model,
-          "\nOwner-", owner, "\nSize-", size, "\nDate Acquired-", date_acquired, "\nNotes-", notes)
+    selected_shoe = createNewShoeEntry(owner)
+
+found_shoe_id = selected_shoe["shoe_id"]
+brand = selected_shoe["brand"]
+model = selected_shoe["model"]
+size = selected_shoe["size"]
+date_acquired = selected_shoe["date_acquired"]
+notes = selected_shoe["notes"]
+print("\nShoe details:\nID-", found_shoe_id, "\nBrand-", brand, "\nModel-", model,
+      "\nOwner-", owner, "\nSize-", size, "\nDate Acquired-", date_acquired, "\nNotes-", notes)
 
 mileage = input("\nEnter mileage (in miles) to date: ")
-test_date = input("Enter test date (YYYY-MM-DD): ")
+test_date = input("Enter test date (YYYY-MM-DD) or 'today': ").strip().lower()
+if test_date == "today":
+    test_date = date.today().isoformat()
 session_notes = input("Enter any notes for this session (optional): ")
 
 with open(sessions_file) as f:
@@ -202,3 +208,18 @@ with open(sessions_file, 'a', newline='') as f:
                       energy_returned, energy_return_pct, stiffness, session_notes])
 
 print(f"\nSession data saved with ID: {new_session_id}")
+
+print("\n" + "="*40)
+print("SESSION REPORT")
+print("="*40)
+print(f"Session ID:       {new_session_id}")
+print(f"Shoe ID:          {found_shoe_id}")
+print(f"Shoe:             {brand} {model} (size {size})")
+print(f"Mileage:          {mileage}")
+print(f"Test date:        {test_date}")
+print(f"Stiffness:        {stiffness:.2f}")
+print(f"Energy stored:    {energy_stored:.2f}")
+print(f"Energy returned:  {energy_returned:.2f}")
+print(f"Energy return %:  {energy_return_pct:.2f}%")
+print(f"Session notes:    {session_notes if session_notes else '(none)'}")
+print("="*40)
