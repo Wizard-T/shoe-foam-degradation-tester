@@ -39,8 +39,9 @@ def calculateEnergyReturn(file):
 
     return stiffness, energy_stored, energy_returned, 100 * energy_returned / energy_stored
 
-def createNewShoeEntry():
-    owner = input("Owner name: ")
+def createNewShoeEntry(owner=None):
+    if owner is None:
+        owner = input("Owner name: ")
     brand = input("Brand: ")
     model = input("Shoe model: ")
     size = input("Enter shoe size: ")
@@ -67,57 +68,115 @@ def listShoesByOwner(owner):
         shoes = [row for row in reader if row["owner"].strip().lower() == owner.strip().lower()]
     return shoes
 
+def listOwners():
+    with open(shoes_file) as f:
+        reader = csv.DictReader(f)
+        seen = {}
+        for row in reader:
+            name = row["owner"].strip()
+            if name and name.lower() not in seen:
+                seen[name.lower()] = name  # keep first-seen casing
+        return list(seen.values())
+
+def findMatchingOwners(name_input, owners):
+    input_words = set(name_input.strip().lower().split())
+    exact_matches = []
+    partial_matches = []
+
+    for owner in owners:
+        owner_words = set(owner.strip().lower().split())
+        if name_input.strip().lower() == owner.strip().lower():
+            exact_matches.append(owner)
+        elif input_words & owner_words:  # any shared word (first name, last name, etc.)
+            partial_matches.append(owner)
+
+    return exact_matches, partial_matches
+
+def selectOwner():
+    owners = listOwners()
+    name_input = input("Shoe owner name: ")
+
+    exact_matches, partial_matches = findMatchingOwners(name_input, owners)
+
+    if len(exact_matches) == 1:
+        return exact_matches[0]
+
+    if len(partial_matches) == 0:
+        print(f"No matching owners found for '{name_input}'.")
+        choice = input("Type 'n' to use this as a new owner name, or press Enter to try again: ").strip().lower()
+        if choice == "n":
+            return name_input
+        else:
+            return selectOwner()
+
+    print("\nPossible matches:")
+    for i, o in enumerate(partial_matches):
+        print(f"{i+1}: {o}")
+    print(f"{len(partial_matches)+1}: None of these — re-enter name")
+    print(f"{len(partial_matches)+2}: Use '{name_input}' as a new owner")
+
+    choice = int(input("Select a number: "))
+    if 1 <= choice <= len(partial_matches):
+        return partial_matches[choice - 1]
+    elif choice == len(partial_matches) + 1:
+        return selectOwner()
+    elif choice == len(partial_matches) + 2:
+        return name_input
+    else:
+        print("Invalid selection, please try again.")
+        return selectOwner()
+
 def selectShoe():
-    owner = input("Owner name: ")
+    owner = selectOwner()
     shoes = listShoesByOwner(owner)
 
     if len(shoes) == 0:
         print("No shoes on file for this owner.")
         return None, owner
 
-    print("\nExisting shoes:")
-    for i, s in enumerate(shoes):
-        print(f"{i+1}: {s['brand']} {s['model']} (size {s['size']})")
-    print(f"{len(shoes)+1}: None of these — enter a new shoe")
-    print(f"{len(shoes)+2}: More details about a shoe (view notes, date acquired, etc.)")
+    while True:
+        print("\nExisting shoes:")
+        for i, s in enumerate(shoes):
+            print(f"{i+1}: {s['brand']} {s['model']} (size {s['size']})")
+        print(f"{len(shoes)+1}: None of these — enter a new shoe")
+        print(f"{len(shoes)+2}: More details about a shoe (view notes, date acquired, etc.)")
 
-    choice = int(input("Select a number: "))
+        choice = int(input("Select a number: "))
 
-    if 1 <= choice <= len(shoes):
-        return shoes[choice - 1]
-    elif choice == len(shoes) + 1:
-        return None
-    elif choice == len(shoes) + 2:
-        shoe_index = int(input("Enter the number of the shoe to view details: ")) - 1
-        if 0 <= shoe_index < len(shoes):
-            selected_shoe = shoes[shoe_index]
-            print("\nShoe details:")
-            print(f"ID: {selected_shoe['shoe_id']}")
-            print(f"Brand: {selected_shoe['brand']}")
-            print(f"Model: {selected_shoe['model']}")
-            print(f"Size: {selected_shoe['size']}")
-            print(f"Owner: {selected_shoe['owner']}")
-            print(f"Date Acquired: {selected_shoe['date_acquired']}")
-            print(f"Notes: {selected_shoe['notes']}\n")
+        if 1 <= choice <= len(shoes):
+            return shoes[choice - 1], owner
+        elif choice == len(shoes) + 1:
+            return None, owner
+        elif choice == len(shoes) + 2:
+            shoe_index = int(input("Enter the number of the shoe to view details: ")) - 1
+            if 0 <= shoe_index < len(shoes):
+                s = shoes[shoe_index]
+                print("\nShoe details:")
+                print(f"ID: {s['shoe_id']}")
+                print(f"Brand: {s['brand']}")
+                print(f"Model: {s['model']}")
+                print(f"Size: {s['size']}")
+                print(f"Owner: {s['owner']}")
+                print(f"Date Acquired: {s['date_acquired']}")
+                print(f"Notes: {s['notes']}\n")
+            else:
+                print("Invalid selection.")
+            # loop back to the menu — no re-prompt for owner
         else:
-            print("Invalid selection.")
-        return selectShoe()  # Allow the user to select again after viewing details
-    else:
-        print("Invalid selection, please try again.")
-        return selectShoe()
+            print("Invalid selection, please try again.")
+            # loop back to the menu
 
 
 # --- main flow ---
 
 stiffness, energy_stored, energy_returned, energy_return_pct = calculateEnergyReturn(data_file)
 
-selected_shoe = selectShoe()
+selected_shoe, owner = selectShoe()
 
 if selected_shoe is None:
-    found_shoe_id = createNewShoeEntry()
+    found_shoe_id = createNewShoeEntry(owner)
 else:
     found_shoe_id = selected_shoe["shoe_id"]
-    owner = selected_shoe["owner"]
     brand = selected_shoe["brand"]
     model = selected_shoe["model"]
     size = selected_shoe["size"]

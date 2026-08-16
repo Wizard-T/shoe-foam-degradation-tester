@@ -1,5 +1,25 @@
 shoe_id,brand,model,size,owner,date_acquired,notes
-1,Nike,Pegasus 41,10.5,Carson,2026-08-13,Pair 1
-2,Asics,Gel Nimbus 27,12,Carson,2024-20-20,
-3,Hoka,CLifton 9,14,Carson,2026-08-13,
-4,Hoka,Clifton 9,12,Carson,2026-11-11,
+1,Nike,Pegasus 41,10.5,Carson Templin,2026-07-01,primary training shoe
+2,Nike,Vaporfly 3,10.5,Carson Templin,2026-08-01,race shoe
+3,Brooks,Ghost 16,10.5,Carson Templin,2026-06-15,backup trainer
+4,Hoka,Clifton 9,10.5,Carson Templin,2026-05-10,easy day shoe
+5,Saucony,Kinvara 15,10.5,Carson Templin,2026-07-20,tempo shoe
+6,ASICS,Novablast 4,10.5,Carson Templin,2026-08-05,new addition
+7,Nike,Pegasus 40,9.0,Carson,2026-04-01,older sibling's shoe
+8,Brooks,Glycerin 21,9.0,Carson,2026-06-01,daily trainer
+9,Hoka,Bondi 8,9.0,Carson,2026-07-15,recovery shoe
+10,New Balance,880v14,10.0,Mike Chen,2026-05-01,training shoe
+11,ASICS,Gel-Kayano 31,10.0,Mike Chen,2026-06-10,stability shoe
+12,Saucony,Endorphin Speed 4,10.0,Mike Chen,2026-07-01,workout shoe
+13,On,Cloudmonster 2,10.0,Mike Chen,2026-08-10,cushioned trainer
+14,Adidas,Adizero Adios Pro 3,7.5,Sarah,2026-06-20,race day shoe
+15,Nike,Invincible 3,7.5,Sarah,2026-05-15,long run shoe
+16,Hoka,Mach X,7.5,Sarah,2026-07-25,tempo shoe
+17,Brooks,Ghost 16,8.0,Sarah Johnson,2026-04-10,everyday trainer
+18,New Balance,1080v13,8.0,Sarah Johnson,2026-06-05,cushioned daily shoe
+19,ASICS,Metaspeed Sky Paris,8.0,Sarah Johnson,2026-08-12,carbon plate race shoe
+20,Puma,Deviate Nitro 3,8.0,Sarah Johnson,2026-07-05,tempo trainer
+21,Mizuno,Wave Rider 27,8.0,Sarah Johnson,2026-05-20,neutral trainer
+22,On,Cloudboom Echo 3,10.5,Carson Templin,2026-08-13,newest race shoe
+23,Under Armour,Velociti Elite 2,9.0,Carson,2026-08-01,recent purchase
+24,Adidas,Ultraboost 22,10.0,Mike Chen,2026-04-15,casual/easy trainer
